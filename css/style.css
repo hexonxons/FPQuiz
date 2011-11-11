@@ -1,0 +1,280 @@
+#flickrimg1 
+{
+	height: 470px; 
+	width: 430px;
+	position: relative;  
+	margin: 0px 5px 5px 25px; 
+	background-color: #f5f5dc; 
+	border: 5px solid #3a3838; 
+	overflow: hidden;
+	z-index:1;
+}
+
+body, html 
+{
+	font: 10pt Arial, Helvetica, sans-serif;
+	background: #fff; 
+	font-size: 12px;
+	#overflow:auto;
+	height:800px;
+}
+
+h1
+{
+	font-size:1.3em;
+	color: #333366;
+	margin-top: 0px;
+	margin-left:30px;
+	position: absolute;
+	top: 120px;
+}
+
+#rating
+{
+	position: absolute;
+	top: 150px;
+	left: 12px;
+	font-size:1.0em;
+	font-family: Verdana, Arial, Helvetica, sans-serif; 
+}
+
+#container
+{ 
+	<!-- the main container, where all app is situated -->
+	width:750px;
+	height:800px;
+	margin:0 auto;
+	background:#f5f5dc;
+	border: 1px solid #8c988d; 
+}
+
+#header
+{
+	font-family: Arial Black; 
+	font-size:1.8em;
+	text-align:center;
+	padding:1px;
+	background: #3b5998;
+	color: #ffe; /* text colour */
+}   
+
+#sidebar
+ {
+	width: 200px;
+	padding: 2px;
+	background:#f5f5dc;
+}   
+
+#content
+{
+	text-align:center;
+	padding: 1px; 
+	background: #f5f5dc; 
+}
+
+#footer
+{
+	background: #3b5998; 
+	color: #fff; 
+	text-align: center;		
+}  
+
+TABLE
+{
+	width: auto; 
+	border-collapse: collapse;
+}
+
+TD
+{
+	width: 200px;
+	padding: 2px; 
+	text-align:left;
+	font-family: Arial Black;
+	background:#f5f5dc;
+}    
+   
+#tst
+{
+	
+	height: 400px; 
+	width: 	500px; 
+	align: top;
+	margin: 0px 5px 5px 10px;
+	position: relative;  
+	background-color: #eceef5;
+	//display:table-cell; 
+	//vertical-align: middle;
+	border: 1px solid #627aad; 
+	overflow: hidden;
+} 
+
+#where_is_it 
+{ 	
+	background: url('../pictures/where-is-it1.gif') no-repeat;
+	border:0px solid;				
+	width: 	463px; 
+	height: 45px;
+	padding-right: 40px;
+	padding-bottom: 10px;
+	text-align: right;
+	font-size:2.7em;
+	font-family: Arial Black;
+	margin: 0px 5px 0px 9px;
+	position: relative;
+	background-color: #f5f5dc; 
+	overflow: hidden;
+	z-index: 5;
+} 
+
+#button_head2
+{
+	margin: 70px 0px 10px 135px;
+}
+
+#scores
+{
+	font-size:2.5em;
+	font-family: Arial Black;
+	position: absolute;
+	top: 90px;
+	left: 390px;
+}
+
+.button 
+{
+	cursor:pointer;
+	display:block;
+	text-align:center;
+	background-repeat:no-repeat;
+	background-position:0 0;
+}
+
+.button.invite 
+{
+	background-image: url('../pictures/invite1.gif');
+	height:30px;
+	width:130px;
+} 
+
+.button.invite:hover
+{
+	background-image:url('../pictures/invite_on1.gif')
+} 
+
+.button.post 
+{
+	background:url('../pictures/post1.gif') no-repeat;
+	height:36px;
+	width:239px;
+} 
+.button.post:hover
+{
+	background-image:url('../pictures/post_on1.gif')
+} 
+
+.button.variant
+{
+	background: url('../pictures/variant1.gif') no-repeat;
+	height:40px;
+	width:120px;
+	float:left;
+	border:0px solid;
+	margin-left:5px;
+	font-family:Arial Black bold;
+	color:#FFF;
+	font-size:1em;
+	//border-color: #000 #000 #000 #000;
+	//padding:10px;
+}	
+.button.variant:hover { background-image:url('../pictures/variant_on1.gif') } 	
+
+#addScores
+{
+	font-size:2.5em;
+	font-family: Arial Black;
+	position: absolute;
+	top: 120px;
+	left: 430px;
+}
+#answer{
+	background: #b5b1a0;
+	font-size:2.5em;
+	font-family: Arial Black;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	color: #ffffff;
+	filter:alpha(opacity=90);
+	opacity: 0.9;
+}
+
+/* Выпадающее окно */
+#box{
+	background:url('../pictures/box_bg.jpg') repeat-x top #fcfcfc;
+	height:200px;
+	padding:20px;
+	margin-top: -10px;
+	padding-top:10px;
+	width:430px;
+	border:1px solid #fcfcfc;
+	color:#494848;
+	text-shadow:1px 1px 0 white;
+	font-family:'Myriad Pro',Arial,Helvetica,sans-serif;
+	z-index: 5;
+}
+
+#box p{
+	font-size:20px;
+	background:url('../pictures/warning.png') no-repeat 10px center;
+	padding-left:80px;
+}
+
+#box p b{
+	font-size:48px;
+	display:block;
+}
+
+#box,
+#main
+{
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+}
+
+/* Дизайн большой кнопки */
+
+/*a.button{
+	color:white;
+	letter-spacing:-2px;
+	padding:20px;
+	display:block;
+	text-shadow:1px 1px 0 #145982;
+	font-family:'Myriad Pro',Arial,Helvetica,sans-serif;
+	font-size:80px;
+	font-weight:bold;
+	text-align:center;
+	width:350px;
+	border:1px solid #60b4e5;
+	
+	margin:60px auto;
+	
+	/*
+		Градиенты CSS3 для браузеров webkit и mozilla,
+		затухающие цвета для других браузеров:
+	
+	
+	background-color: #59aada;
+	background-image: -moz-linear-gradient(#5eb2e2, #4f9cca);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#5eb2e2), to(#4f9cca));
+}
+
+a.button:hover{
+    /* Более светлые градиенты для эффекта зависания *
+	text-decoration:none;
+	background-color: #5eb2e2;
+	background-image: -moz-linear-gradient(#6bbbe9, #57a5d4);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6bbbe9), to(#57a5d4));
+}*/
+

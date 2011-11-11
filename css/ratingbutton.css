@@ -1,0 +1,38 @@
+/* Яйчейка рейтинга */
+.Rating-container
+{  
+}
+
+.Rating-content
+{
+  background-color: #E0E0A8;
+  padding: 3px;
+}
+
+.Rating-1, .Rating-2, .Rating-3, .Rating-4
+{
+  background-color: #E0E0A8;
+  height: 1px;
+  overflow: hidden;
+}
+
+.Rating-1 
+{
+  margin: 0 5px;
+}
+
+.Rating-2 
+{
+  margin: 0 3px;
+}
+
+.Rating-3 
+{
+  margin: 0 2px;
+}
+
+.Rating-4 
+{
+  margin: 0 1px;
+}
+

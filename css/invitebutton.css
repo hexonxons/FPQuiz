@@ -1,0 +1,47 @@
+/* Яйчейка кнопок "invite friends" и "post picture" */
+.Btn-container
+{
+	width: 60px;
+	height: 60px;
+	position: absolute;
+}
+
+.Btn-content
+{
+	background-color: #E0E0A8;
+	height:	60px;
+}
+
+.Btn-1, .Btn-2, .Btn-3, .Btn-4
+{
+	background-color: #E0E0A8;
+	height: 1px;
+}
+
+.Btn-1 
+{
+	margin: 0 5px;
+}
+
+.Btn-2 
+{
+	margin: 0 3px;
+}
+
+.Btn-3 
+{
+	margin: 0 2px;
+}
+
+.Btn-4 
+{
+	margin: 0 1px;
+}
+
+.Caption
+{
+	width: 60px;
+	height: 20px;
+	font: 10pt Courier New;
+	text-align: center;
+}
