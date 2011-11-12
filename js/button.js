@@ -14,8 +14,7 @@ function ButtonClass(ButtonId, // Id div`а, на которую навешив�
 					 MouseClickColor, 	// Цвет кнопки при нажатии мыши
 					 OnClickFunction, 	// Функция, вополняемая при нажатии кнопки
 					 InnerButtonElementHtml, 	// Html, расположенный внутри кнопки
-					 UnderText,					// Текст подписи под кнопкой
-					 ExtCssPropForButtonDataDiv)	// Нахуй вроде не надо
+					 UnderText)					// Текст подписи под кнопкой
 {
 	var mMainButtonDiv;
 	var mButtonId;
@@ -25,7 +24,6 @@ function ButtonClass(ButtonId, // Id div`а, на которую навешив�
 	var mMouseOverColor;
 	var mMouseClickColor;
 	var mInnerButtonElementHtml;
-	var mExtCssPropForButtonDataDiv;
 	var mUnderText;
 	
 	var mOnClickFunction = {f:function(){}};
@@ -51,7 +49,7 @@ function ButtonClass(ButtonId, // Id div`а, на которую навешив�
 					<div class='Btn-4'></div>\
 					<div class='Btn-4'></div>\
 				</div>\
-				<div class='Btn-content'></div>\
+				<div id = 'Btn-content' class='Btn-content'></div>\
 				<div>\
 					<div class='Btn-4'> </div>\
 					<div class='Btn-4'> </div>\
@@ -66,7 +64,6 @@ function ButtonClass(ButtonId, // Id div`а, на которую навешив�
 		
 		mMainButtonDiv.style.cssText += "position: absolute; width: " + mWidth.toString() + ";";
 		mMainButtonDiv.children[1].style.cssText += "height: " + (mHeight - 10).toString() + ";";
-		mMainButtonDiv.children[1].style.cssText += ExtCssPropForButtonDataDiv;
 		mMainButtonDiv.children[1].innerHTML = mInnerButtonElementHtml;
 		SetColor(mMainColor);
 	}
@@ -124,7 +121,6 @@ function ButtonClass(ButtonId, // Id div`а, на которую навешив�
 	mOnClickFunction = OnClickFunction;
 	mInnerButtonElementHtml = InnerButtonElementHtml;
 	mUnderText = UnderText;
-	mExtCssPropForButtonDataDiv = ExtCssPropForButtonDataDiv;
 	InitButton();
 	
 	// навешиваем обработчики

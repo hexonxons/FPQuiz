@@ -12,15 +12,16 @@ function RatingClass(UserId)
 {
 	// div всей таблицы рейтинга
 	var RatingDiv = document.getElementById('rating');
-	// массив пользователей в рейтинге
+	// массив игроков в рейтинге
 	var RatingTable = new Array();
-	// объект UserData пользователя, который считается активным
+	// объект UserData активного игрока
 	var	ActiveUserObject;
-	// id пользователя, запустившего приложение
-	var MainUserID;
+	// id игрока
+	var MainUserId;
+	// позиция игрока в текущем отображаемом рейтинге
 	var MainUserRatingPosition;
 	
-	// класс пользователя в таблице рейтинга
+	// класс игрока в таблице рейтинга
 	// IN:
 	// ---	RatingDiv - div всей таблицы рейтинга
 	// ---	i - номер пользователя
@@ -30,16 +31,18 @@ function RatingClass(UserId)
 		this.UserId = "";
 		// основной div кнопки рейтинга
 		this.MainDiv = RatingDiv.children[i];
-		// div позиции пользователя в таблице рейтинга
+		// div позиции игрока в таблице рейтинга
 		this.UserRankDiv = this.MainDiv.children[1].children[0];
-		// div картинки пользователя в таблице рейтинга
+		// div картинки игрока в таблице рейтинга
 		this.UserPicDiv = this.MainDiv.children[1].children[1].children[0];
-		// div имени пользователя в таблице рейтинга
+		// div имени игрока в таблице рейтинга
 		this.UserNameDiv = this.MainDiv.children[1].children[2].children[0];
-		// div очков пользователя в таблице рейтинга
+		// div очков игрока в таблице рейтинга
 		this.UserScoreDiv = this.MainDiv.children[1].children[2].children[1].children[0];
-		// div анимации очков пользователя в таблице рейтинга
+		// div анимации очков игрока в таблице рейтинга
 		this.UserAnimateDiv = this.MainDiv.children[1].children[2].children[1].children[1];
+		// позиция в рейтинге
+		this.UserPosition;
 	}
 
 /*
@@ -57,7 +60,7 @@ function RatingClass(UserId)
 			UpdateRating();
 	}
 	
-	// функция изменения счета активного пользователя
+	// функция изменения счета активного игрока
 	// IN:
 	// ---	points - количество очков, которое должно прибавиться к очкам пользователя
 	// ---	isRight - флаг правильного ответа на вопрос
@@ -66,7 +69,7 @@ function RatingClass(UserId)
 		// возвращаемые данные для бд
 		var reti = new Array();
 		
-		// если активный пользователь - пользователь, запустивший приложение,
+		// если активный игрока - пользователь, запустивший приложение,
 		if(ActiveUserObject.UserId == RatingTable[MainUserRatingPosition].UserId)
 		{
 			// если ответ правильный, то прибавляем к счету пользователя, запустившего приложение points очков
@@ -78,7 +81,7 @@ function RatingClass(UserId)
 			// если ответ неправильный
 			else
 			{
-				// Если счет пользователя, запустившего приложение, больше 100 очков, то вычитаем 2 очка
+				// Если счет игрока, запустившего приложение, больше 100 очков, то вычитаем 2 очка
 				if(parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) > 100)
 				{
 					RatingTable[MainUserRatingPosition].UserScoreDiv.innerText = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) - 2;
@@ -89,26 +92,26 @@ function RatingClass(UserId)
 			reti['score'] = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText);
 			reti['id'] = RatingTable[MainUserRatingPosition].UserId;
 		}
-		// если активный пользователь - не пользователь, запустивший приложение
+		// если активный игрока - не игрока, запустивший приложение
 		else
 		{
-			// если ответ правильный, то вычитаем из счета активного пользователя points очков
+			// если ответ правильный, то вычитаем из счета активного игрока points очков
 			if(isRight)
 			{
 				ActiveUserObject.UserScoreDiv.innerText = parseInt(ActiveUserObject.UserScoreDiv.innerText) - points;
 				AnimateScore(ActiveUserObject.UserAnimateDiv, '-' + points, 'ff0000');
 				
-				// в возвращаемый массив по индексу score кладем значение счета и id пользователя
+				// в возвращаемый массив по индексу score кладем значение счета и id активного игрока
 				reti['score'] = parseInt(ActiveUserObject.UserScoreDiv.innerText);
 				reti['id'] = ActiveUserObject.UserId;
 			}
-			// если ответ неправильный, то вычитаем из счета пользователя, запустившего приложение 2 очка
+			// если ответ неправильный, то вычитаем из счета игрока, запустившего приложение 2 очка
 			else
 			{
 				RatingTable[MainUserRatingPosition].UserScoreDiv.innerText = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) - 2;
 				AnimateScore(RatingTable[MainUserRatingPosition].UserAnimateDiv, '-2', 'ff0000')
 				
-				// в возвращаемый массив по индексу score кладем значение счета и id пользователя
+				// в возвращаемый массив по индексу score кладем значение счета и id игрока, запустившего приложение
 				reti['score'] = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText);
 				reti['id'] = RatingTable[MainUserRatingPosition].UserId;
 			}
@@ -120,6 +123,22 @@ function RatingClass(UserId)
 /*
  * Приватные методы
  */		
+ 
+	// Задание цвета кнопки
+	// IN:
+	// ---	color - цвет
+	// ---	obj - div, включающий в себя всю яйчейку кнопки
+	var SetColor = function(color, obj)
+	{
+		// закрашиваем кнопку
+		for(var i = 0; i < 5; ++i)
+		{
+			obj.children[0].children[i].style.background = color;
+			obj.children[2].children[i].style.background = color;
+		}
+		obj.children[1].style.background = color;
+	}
+	
 	// функция обновления содержимого рейтинга
 	// TODO: покорявить php файлы
 	var UpdateRating = function()
@@ -140,9 +159,20 @@ function RatingClass(UserId)
 							},
 				success	:	function(json)
 							{
+								// пользователь играет за себя?
+								var isYaPlaying = ActiveUserObject.UserId == RatingTable[MainUserRatingPosition].UserId ? true : false;
+								// текущая позиция пользователя
+								var MainUserCurrentPosition = MainUserRatingPosition;
+								// текущий объект активного игрока
+								var ActiveUserCurrentPosition = ActiveUserObject.UserPosition;
+								// id активного игрока
+								var ActiveUserId = ActiveUserObject.UserId;
+								// новая позиция пользователя
+								var MainUserNewPosition = 0;
+								// новый объект активного игрока
+								var ActiveUserNewPosition = 0;
+								
 								var data = jQuery.parseJSON(json);
-								var CurrentActiveUserID = 0;
-								var CurrentMainPosition = MainUserRatingPosition;
 								for(var i = 0; i < 5; ++i)
 								{
 									RatingTable[i].UserId = data[i].id;
@@ -151,26 +181,54 @@ function RatingClass(UserId)
 									RatingTable[i].UserRankDiv.innerText = data[i].rank;
 									RatingTable[i].UserPicDiv.src = data[i].pic;
 									RatingTable[i].UserScoreDiv.innerText = data[i].score;
+									RatingTable[i].UserPosition = i;
+									
 									// проверяем нашу позицию в рейтинге
-									// она могла измениться(со 2й), например на 1ю. Надо бы обновить
-									if(MainUserID == data[i].id)
-										MainUserRatingPosition = i;
-									// да, мы могли играть против человека X и опустить его в задницу за рейтинг.
-									// так как продолжать его опускать уже негуманно, надо поставить счетчик на себя.
-									// если опустили еще не за границу - надо завершить начатое, ибо нехрен
-									if(ActiveUserObject.UserId == data[i].id)
-										CurrentActiveUserID = data[i].id;										
+									
+									if(MainUserId == data[i].id)
+										MainUserNewPosition = i;	
+										
+									// опуская игрока мы меняем его позицию в рейтинге. Надо оставить его активным
+									if(ActiveUserId == data[i].id)
+										ActiveUserNewPosition = i;						
 								}
-								// если ID выбранного пользователя не изменилось, это значит только то,
-								// что мы его выкинули за границы рейтинга. Цель достигнута, ставим себя активным
-								if(CurrentActiveUserID == 0)
-									SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv)
-								else	
-									// иначе есть еще шанс, что мы опустили себя(или подняли)
-									// если наша позиция в таблице рейтинга сменилась, то надо-бы обновится
-									if(CurrentMainPosition != MainUserRatingPosition)
+								
+								if(isYaPlaying && MainUserCurrentPosition != MainUserNewPosition)
+								{
+									// Если игрок играет за себя и его текущая позиция сменилась, например был 1м, а стал 2м,
+									// то задаем его активным(раньше активным была 1я позиция рейтинга) и меняем его номер в рейтинге.
+									// 
+									// Обычно этот номер = 2.
+									SetActiveUser(RatingTable[MainUserNewPosition].MainDiv);
+									MainUserRatingPosition = MainUserNewPosition;
+								}
+								else
+									if(!isYaPlaying)
 									{
-										SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv);
+										// Если игрок играет против кого-то, то обновление рейтинга произошло
+										// из-за того, что сменилась позиция игрока, либо сменилась позиция того,
+										// против кого игрок играет.
+										//
+										// В 1 случае игрок может сместиться так, что пользователь, против кого игрок играет,
+										// окажется более чем на 2 позиции выше в рейтинге, то есть
+										// пропадет из текущей отображаемой таблицы рейтинга. Тогда активным пользователем делаем
+										// игрока.
+										//
+										// Во втором случае надо ставить активной позицию того,
+										// против кого игрок играет. 
+										//
+										// Случай <100 очков обрабатывается в самой функции SetActiveUser()
+										if(ActiveUserNewPosition != 0)
+										{
+											SetActiveUser(RatingTable[ActiveUserNewPosition].MainDiv);
+											ActiveUserObject = RatingTable[ActiveUserNewPosition];
+										}
+										else
+										{
+											SetActiveUser(RatingTable[MainUserNewPosition].MainDiv);
+											MainUserRatingPosition = MainUserNewPosition;
+										}
+										
 									}
 							}
 			});
@@ -226,75 +284,59 @@ function RatingClass(UserId)
 	{
 		if(obj.children[1].style.background != "rgb(184, 184, 151)")
 		{
-			// закрашиваем нового игрока
-			for(var i = 0; i < 5; ++i)
-			{
-				obj.children[0].children[i].style.background = 'D6D6A9';
-				obj.children[2].children[i].style.background = 'D6D6A9';
-			}
-			obj.children[1].style.background = 'D6D6A9';
+			// закрашиваем
+			SetColor('#D6D6A9', obj);
 		}
 	}
 	
-	// выделение div при наведении курсора
+	// выделение div при уведении курсора
 	// IN:
 	// ---	obj - div, включающий в себя всю яйчейку рейтинга
 	var MouseOut = function(obj)
 	{
 		if(obj.children[1].style.background != "rgb(184, 184, 151)")
 		{
-			// закрашиваем нового игрока
-			for(var i = 0; i < 5; ++i)
-			{
-				obj.children[0].children[i].style.background = 'E0E0A8';
-				obj.children[2].children[i].style.background = 'E0E0A8';
-			}
-			obj.children[1].style.background = 'E0E0A8';
+			SetColor('#E0E0A8', obj);
 		}
 	}
 	
 	// функция установки игрока активным
 	// IN:
 	// ---	obj - div, включающий в себя всю яйчейку рейтинга
+	//
+	// DESC:
+	// По сути - выделение кнопки рейтинга другим цветом и установка переменной активного пользователя.
 	var SetActiveUser = function(obj)
 	{		
-		// если активный пользователь - не пользователь, запустивший приложение
-		// и количество очков пользователя, запустившего приложение < 100,
+		// если активным пользователем хотим сделать не игрока и количество очков игрока < 100,
 		// то переключение в режим "игры против" невозможно
 		if(RatingTable[parseInt(obj.id)].UserId != RatingTable[MainUserRatingPosition].UserId)
 		{
 			if(parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) < 100)
+			{
+				// TODO: нужен ли этот вызов?
+				SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv);
 				return;
+			}
+		}
+		
+		// если активным пользователем хотим сделать не игрока и количество очков игрока, против которого хотим играть < 100,
+		// то переключение в режим "игры против" невозможно
+		if(parseInt(RatingTable[parseInt(obj.id)].UserScoreDiv.innerText) < 100)
+		{
+			// TODO: нужен ли этот вызов?
+			SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv);
+			return;
 		}
 		
 		// убираем выборку предыдущего игрока
-		UnsetActiveUser(ActiveUserObject.MainDiv);
+		SetColor('#E0E0A8', ActiveUserObject.MainDiv);
+		
 		// выбираем нового игрока
 		ActiveUserObject = RatingTable[parseInt(obj.id)];
 		
 		// закрашиваем нового игрока
-		for(var i = 0; i < 5; ++i)
-		{
-			obj.children[0].children[i].style.background = 'B8B897';
-			obj.children[2].children[i].style.background = 'B8B897';
-		}
-		obj.children[1].style.background = 'B8B897';
-		
-		// TODO: Убрать эту часть за класс
-		getNewPicture();
-	}
-
-	// функция сброса выделения с игрока, бывшего активным
-	// IN:
-	// ---	obj - div, включающий в себя всю яйчейку рейтинга
-	var UnsetActiveUser = function(obj)
-	{
-		for(var i = 0; i < 5; ++i)
-		{
-			obj.children[0].children[i].style.background = 'E0E0A8';
-			obj.children[2].children[i].style.background = 'E0E0A8';
-		}
-		obj.children[1].style.background = 'E0E0A8';
+		SetColor('#B8B897', obj);
 	}
 	
 	// анимация счета при ответе
@@ -323,7 +365,7 @@ function RatingClass(UserId)
 	// инициализируем сами div`ы
 	InitRating();
 	// задаем свой Id
-	MainUserID = UserId;
+	MainUserId = UserId;
 	
 	// инициализация массива пользователей
 	for(var i = 0; i < 5; ++i)
@@ -339,6 +381,8 @@ function RatingClass(UserId)
 		});
 		$(RatingTable[i].MainDiv).click(function(){
 			SetActiveUser(this);
+			// TODO: Убрать эту часть за класс
+			getNewPicture();
 		});
 	}
 	
@@ -361,7 +405,9 @@ function RatingClass(UserId)
 									RatingTable[i].UserRankDiv.innerText = data[i].rank;
 									RatingTable[i].UserPicDiv.src = data[i].pic;
 									RatingTable[i].UserScoreDiv.innerText = data[i].score;
-									if(MainUserID == data[i].id)
+									RatingTable[i].UserPosition = i;
+									
+									if(MainUserId == data[i].id)
 										MainUserRatingPosition = i;
 								}
 							}
@@ -370,5 +416,4 @@ function RatingClass(UserId)
 	// задаем себя активным игроком
 	ActiveUserObject = RatingTable[MainUserRatingPosition];
 	SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv);
-	
 }	

@@ -29,7 +29,6 @@
 	var isAnswered;
 	var attempts = 0;
 	var photoURL;
-	var div;
 	var isRight;
 	var points = 0;		
 	var RatingTable;
@@ -41,6 +40,7 @@
 	var AnswerButton2;
 	var AnswerButton3;
 	var AnswerButton4;
+	var isNewsButtonPressed = false;
 
 	// выполняется по загрузке документа
 	$(document).ready(function(){
@@ -61,18 +61,26 @@
 							}
 			});
 			
-			div = document.getElementById('where_is_it');
-			div.style.color = '#00ff00';
-			
-			$('#where_is_it').text(MyScore);
-			FlickrImage = $('#flickrimg');
 			RatingTable = new RatingClass(MyUserId);
 			
-			// Инит функциональных кнопок
+			$('#where_is_it').css('color', '#dfecaa');	
+			$('#where_is_it').text(MyScore);
+			
+			FlickrImage = $('#flickrimg');
+			FlickrImage.css('opacity', '0.0');
+			
+			document.getElementById('flickrimg').onload = function()
 			{
+				FlickrImage.animate({opacity: 1.0}, 1000);
+				$('div[id*="variant"] .Btn-content .Caption').animate({opacity: 1}, 1000);
+				$('div[id*="variant"] .Btn-content').animate({height: '30px'}, 1000);	
+			}
+
+			{
+				// Инит функциональных кнопок
 				var func = {f:function(){Invite();}};
 				var InnerButtonElementHtml = "<img src='./pictures/InviteFriends.png' style='width: 60px'>";
-			    var InviteFriends = new ButtonClass("InviteFriendsButton",
+				var InviteFriendsBtn = new ButtonClass("InviteFriendsButton",
 										60, 
 										70, 
 										'#E0E0A8', 
@@ -81,9 +89,10 @@
 										func.f,
 										InnerButtonElementHtml,
 										"Invite friends");
-				var func = {f:function(){PostPicture();}};
+										
+				func = {f:function(obj){PostPicture(obj);}};
 				var InnerButtonElementHtml = "<img src='./pictures/PostPicture.png' style='width: 60px'>";
-			    var PostPicture = new ButtonClass("PostPictureButton",
+				var PostPictureBtn = new ButtonClass("PostPictureButton",
 										60, 
 										70, 
 										'#E0E0A8', 
@@ -94,26 +103,26 @@
 										"Post picture");
 			}
 			
-			// Инит кнопок ответа
 			{
-				var func = {f:function(obj){checkAnswer(obj);}};
+				// Инит кнопок ответа
+				var AnswerFunction = {func:function(obj){checkAnswer(obj);}};
 				
 				var InnerButtonElementHtml = "<div id='ans'></div>";
-			    AnswerButton1 = new ButtonClass("variant1",
+				AnswerButton1 = new ButtonClass("variant1",
 										120, 
 										40, 
 										'#668BD9',
 										'#87ACFA', 
 										'#BDBEF0',
-										func.f,
+										AnswerFunction.func,
 										InnerButtonElementHtml);
-			    AnswerButton2 = new ButtonClass("variant2",
+				AnswerButton2 = new ButtonClass("variant2",
 										120, 
 										40,
 										'#668BD9',
 										'#87ACFA', 
 										'#BDBEF0',
-										func.f,
+										AnswerFunction.func,
 										InnerButtonElementHtml);
 				AnswerButton3 = new ButtonClass("variant3",
 										120, 
@@ -121,22 +130,29 @@
 										'#668BD9',
 										'#87ACFA', 
 										'#BDBEF0',
-										func.f,
+										AnswerFunction.func,
 										InnerButtonElementHtml);
-			    AnswerButton4 = new ButtonClass("variant4",
+				AnswerButton4 = new ButtonClass("variant4",
 										120, 
 										40,
 										'#668BD9',
 										'#87ACFA', 
 										'#BDBEF0',
-										func.f,
+										AnswerFunction.func,
 										InnerButtonElementHtml);
 			}
+
+			// Конвертируем тег div #box в bounceBox
+			$('#box').bounceBox();
 			
-			document.getElementById('flickrimg').onload=function()
-			{
-				FlickrImage.animate({opacity: 1.0}, 1000);
-			}
+			// Если в области выпадающего окна была нажата кнопка мыши, то открываем окно
+			$('#box').click(function(){
+				$('#box').bounceBoxHide();
+				$('#buttonnew').css('background', "url('pictures/button.gif')");
+				isNewsButtonPressed = !isNewsButtonPressed;
+			});
+			
+			getNewPicture();
 		});  
 
         
@@ -144,21 +160,18 @@
 	{
 		$.getJSON('func.php?getNewPicture', function(obj)
 		{
-			var tags = obj.tags;
 			points = obj.points;
-			jQuery('#a-link').remove();
 			var apiKey = 'c96fc17af511ecd80f566e7f8ea8c6ea';
 
 			// Ищем картинку
 			var num = Math.random()*100;
-			$.getJSON('http://api.flickr.com/services/rest/?&method=flickr.photos.search&api_key=' + apiKey + '&tags='+tags+'&tag_mode=bool&sort=interestingness-desc&per_page=1&page='+num+'&format=json&jsoncallback=?',
-			
+			$.getJSON('http://api.flickr.com/services/rest/?&method=flickr.photos.search&api_key=' + apiKey + '&tags=' + obj.tags + '&tag_mode=bool&sort=interestingness-desc&per_page=1&page=' + num + '&format=json&jsoncallback=?',	
 			function(data)
 			{
 				if (data.photos.photo.length >=1)
 				{
 					// Проходим по результатам
-					$.each(data.photos.photo, function(i,item)
+					$.each(data.photos.photo, function(i, item)
 					{
 						// Строим URL фотографии
 						photoURL = 'http://farm' + item.farm + '.static.flickr.com/' + item.server + '/' + item.id + '_' + item.secret + '.jpg';	
@@ -172,13 +185,16 @@
 						{	
 
 							FlickrImage.animate({opacity: 0.0}, 1000);
+							$('div[id*="variant"] .Btn-content .Caption').animate({opacity: 0.0}, 200);
+							$('div[id*="variant"] .Btn-content').animate({height: '0px'}, 1000);
+								
 							FlickrImage.attr({src: photoURL});
 							
 							// Задаем варианты ответа            
-							AnswerButton1.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px'>" + obj.var0 + "</div>")
-							AnswerButton2.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px'>" + obj.var1 + "</div>")
-							AnswerButton3.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px'>" + obj.var2 + "</div>")
-							AnswerButton4.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px'>" + obj.var3 + "</div>")
+							AnswerButton1.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px; opacity: 0'>" + obj.var0 + "</div>")
+							AnswerButton2.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px; opacity: 0'>" + obj.var1 + "</div>")
+							AnswerButton3.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px; opacity: 0'>" + obj.var2 + "</div>")
+							AnswerButton4.SetInnerVal("<div class='Caption' style='position: relative; vertical-align: middle; top: 5px; opacity: 0'>" + obj.var3 + "</div>")
 
 							ans = obj.answer;	
 							isAnswered = false;
@@ -198,6 +214,8 @@
 	{
 		if(!isAnswered)
 		{
+									
+							
 			PressedButtonId = obj.id;
 			isRight = 0;
 			++attempts;
@@ -210,6 +228,9 @@
 				isRight = 1;
 				
 				var newScoreSet = RatingTable.ChangeScore(parseInt(points), isRight);
+				if(newScoreSet['id'] == MyUserId)
+					$('#where_is_it').text(newScoreSet['score']);
+					
 				$.ajax({
 					type : 'POST',
 					url : 'func.php',
@@ -226,7 +247,9 @@
 				$('#answer').css('background', 'ff0033');
 				
 				var newScoreSet = RatingTable.ChangeScore(parseInt(points), isRight);
-				
+				if(newScoreSet['id'] == MyUserId)
+					$('#where_is_it').text(newScoreSet['score']);
+					
 				$.ajax({
 					type : 'POST',
 					url : 'func.php',
@@ -245,6 +268,7 @@
 			$('#answer').animate({ "top" : "+=50px"}, 1000);
 			$('#answer').animate({ "top" : "-=50px"}, 1000);
 			$('#answer').fadeOut("slow");
+			
 			getNewPicture();
 			RatingTable.CheckRating();
 		}
@@ -278,6 +302,24 @@
 				name: "Click here to play!"			
 			}
 		);		
+	}
+	
+	function onNewButtonClick(obj)
+	{
+		if(!isNewsButtonPressed)
+		{
+			$(obj).css('background', "url('pictures/button_push_light.gif')");
+			$('#box').bounceBoxToggle();
+			isNewsButtonPressed = !isNewsButtonPressed;
+			//obj.preventDefault();
+		}
+		else
+		{
+			$('#box').bounceBoxHide();
+			$(obj).css('background', "url('pictures/button.gif')");
+			isNewsButtonPressed = !isNewsButtonPressed;
+		}
+			
 	}
 </script>
 
@@ -318,16 +360,11 @@
 					<div id='answer'></div>
 				</div>
 				<div id='addScores'></div>
-				<p style="margin-left:7px">
-					<!--<button id ="variant1" class="button variant" onclick='checkAnswer(this.id)'></button>
-					<button id ="variant2" class="button variant" onclick='checkAnswer(this.id)'></button>
-					<button id ="variant3" class="button variant" onclick='checkAnswer(this.id)'></button>
-					<button id ="variant4" class="button variant" onclick='checkAnswer(this.id)'></button>-->
-					
+				<p style="margin-left:7px">			
 					<div id ="variant1" style=""></div>
 					<div id ="variant2" style="left: 140px;"></div>
 					<div id ="variant3" style="left: 270px;"></div>
-					<div id ="variant4" style="left:400px;"></div>
+					<div id ="variant4" style="left: 400px;"></div>
 				</p>
 				
 				<iframe src="http://www.facebook.com/plugins/like.php?href=http://apps.facebook.com/flpquiz/game.php&amp;
@@ -359,16 +396,16 @@
 					</div>
 					<h1>Scoresheet</h1>
 					<div id='rating'></div>
+					<button id='buttonnew' class="button new" style ='position: absolute; top: 500px;' onclick='onNewButtonClick(this)'></button>
 				</div>
 			</td>
 			</table>
 			
-			<div id="footer" style='position:relative; bottom:-140px;'> HEX Technologies //dev 1.1.0</div>
+			<div id="footer" style='position:relative; bottom:-50px;'> HEX Technologies //dev 1.1.0</div>
 			</div> </td>
 			
-			<a class="button" href="#">Tratata</a>
 			<div id="box">
-				<p><b>New option!</b>Вы можете не только увеличивать свои очки путем правильного ответа на вопросы, но и уменьшать очки ближайших к вам конкурентов!</p>
+				<p><b>New option!</b>Вы можете не только увеличивать свои очки путем правильного ответа на вопросы, но и уменьшать очки ближайших к вам конкурентов! Щелкните на иконку противника и продолжайте играть.</p>
 			</div>
 			
 	</body>
