@@ -1,6 +1,5 @@
 <?php
 	require_once "defs.php";
-	require_once "dbconnect.php";
 	
 	// если сессия не открыта
 	if(!isset($_SESSION['me']))
@@ -54,6 +53,5 @@
 			$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 			mysql_free_result($result);
 		}
-		mysql_close($dbconn);
 	}
 ?>

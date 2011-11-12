@@ -1,10 +1,5 @@
 <?php
 	require_once "defs.php";
-	require_once "dbconnect.php";
-	
-	// Cоединяемся с базой
-	//$dbconn = mysql_connect($db_addr, $db_user, $db_passw) or die ('Can\'t connect : ' . mysql_error());
-	//$dbselect = mysql_select_db($db_user, $dbconn) or die ('Can\'t use this database: ' . mysql_error());
 
 	$query = 'SELECT count(*) as last FROM scores';
 	$result = mysql_query($query) or die('Query failed: ' . mysql_error());

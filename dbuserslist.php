@@ -1,6 +1,5 @@
 <?php
 	require_once "defs.php";
-    require_once "dbconnect.php";
     
 	// Performing SQL query
 	$query = 'SELECT * FROM fbuser';

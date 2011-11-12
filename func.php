@@ -1,6 +1,5 @@
 <?php
 	require_once "defs.php";
-	require_once "dbconnect.php";
 	
 	function getScore($id)
 	{
@@ -54,6 +53,13 @@
 		$rank = $line['rank'];
 		mysql_free_result($result);
 		
+		// получаем место последнего игрока
+		$query = 'SELECT count(*) as last FROM scores';
+		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		$line = mysql_fetch_assoc($result);
+		$last = $line['last'];
+		mysql_free_result($result);
+	
 		$reti = Array();
 		$userdata[] = Array();
 		
@@ -62,7 +68,19 @@
 			$name = $facebook->api('/' . $_SESSION['ratingUsers'][$i]['id']);
 			$userdata['id'] = $_SESSION['ratingUsers'][$i]['id'];
 			$userdata['name'] = $name['first_name'];
-			$userdata['rank'] = $rank - 2 + $i;
+			if($rank != 1 && $rank != 2 && $rank != $last && $rank != $last -1)
+				$userdata['rank'] = $rank - 2 + $i;
+			else
+			{
+				if($rank == 1)
+					$userdata['rank'] = $rank + $i;
+				elseif($rank == 2)
+					$userdata['rank'] = $rank - 1 + $i;
+				elseif($rank == $last)
+					$userdata['rank'] = $rank + 5 - $i;
+				elseif($rank == $last - 1)
+					$userdata['rank'] = $rank + 4 - $i;
+			}
 			$userdata['pic'] = "https://graph.facebook.com/". $_SESSION['ratingUsers'][$i]['id'] . "/picture";
 			$userdata['score'] = $_SESSION['ratingUsers'][$i]['score'];
 			$reti[$i] = $userdata;

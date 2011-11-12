@@ -213,12 +213,12 @@ TD
 #box{
 	background:url('../pictures/box_bg.jpg') repeat-x top #fcfcfc;
 	height:200px;
-	padding:20px;
-	margin-top: -10px;
-	padding-top:10px;
+	padding:10px;
+	margin-top: -50px;
+	padding-top:0px;
 	width:430px;
 	border:1px solid #fcfcfc;
-	color:#494848;
+	color:#000000;
 	text-shadow:1px 1px 0 white;
 	font-family:'Myriad Pro',Arial,Helvetica,sans-serif;
 	z-index: 5;
@@ -226,8 +226,9 @@ TD
 
 #box p{
 	font-size:20px;
-	background:url('../pictures/warning.png') no-repeat 10px center;
-	padding-left:80px;
+	margin-top:6px;
+	background:url('../pictures/new1.gif') no-repeat 10px center;
+	padding-left:120px;
 }
 
 #box p b{
@@ -242,39 +243,3 @@ TD
 	-webkit-border-radius:10px;
 	border-radius:10px;
 }
-
-/* Дизайн большой кнопки */
-
-/*a.button{
-	color:white;
-	letter-spacing:-2px;
-	padding:20px;
-	display:block;
-	text-shadow:1px 1px 0 #145982;
-	font-family:'Myriad Pro',Arial,Helvetica,sans-serif;
-	font-size:80px;
-	font-weight:bold;
-	text-align:center;
-	width:350px;
-	border:1px solid #60b4e5;
-	
-	margin:60px auto;
-	
-	/*
-		Градиенты CSS3 для браузеров webkit и mozilla,
-		затухающие цвета для других браузеров:
-	
-	
-	background-color: #59aada;
-	background-image: -moz-linear-gradient(#5eb2e2, #4f9cca);
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#5eb2e2), to(#4f9cca));
-}
-
-a.button:hover{
-    /* Более светлые градиенты для эффекта зависания *
-	text-decoration:none;
-	background-color: #5eb2e2;
-	background-image: -moz-linear-gradient(#6bbbe9, #57a5d4);
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6bbbe9), to(#57a5d4));
-}*/
-

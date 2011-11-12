@@ -2,12 +2,13 @@
  * Класс обработки событий, связанных с рейтингом
  * 
  * Copyright © 2011 Hexonxons
+ * 
+ * v 1.1
  *  
- * Я уже ебнулся писать эту хрень
  */	
 
 // класс рейтинга
-function RatingClass()
+function RatingClass(UserId)
 {
 	// div всей таблицы рейтинга
 	var RatingDiv = document.getElementById('rating');
@@ -15,6 +16,9 @@ function RatingClass()
 	var RatingTable = new Array();
 	// объект UserData пользователя, который считается активным
 	var	ActiveUserObject;
+	// id пользователя, запустившего приложение
+	var MainUserID;
+	var MainUserRatingPosition;
 	
 	// класс пользователя в таблице рейтинга
 	// IN:
@@ -43,12 +47,13 @@ function RatingClass()
  */		
  
  	// функция проверки рейтинга на необходимость обновления
+ 	// написана через задницу
 	this.CheckRating = function()
 	{
-		var MyScore = parseInt(RatingTable[2].UserScoreDiv.innerText);
-		var PrevScore = parseInt(RatingTable[3].UserScoreDiv.innerText);
-		var NextScore = parseInt(RatingTable[1].UserScoreDiv.innerText);
-		if(MyScore < PrevScore || MyScore > NextScore)
+		if( parseInt(RatingTable[0].UserScoreDiv.innerText) < parseInt(RatingTable[1].UserScoreDiv.innerText) ||
+			parseInt(RatingTable[1].UserScoreDiv.innerText) < parseInt(RatingTable[2].UserScoreDiv.innerText) ||
+			parseInt(RatingTable[2].UserScoreDiv.innerText) < parseInt(RatingTable[3].UserScoreDiv.innerText) ||
+			parseInt(RatingTable[3].UserScoreDiv.innerText) < parseInt(RatingTable[4].UserScoreDiv.innerText))
 			UpdateRating();
 	}
 	
@@ -62,27 +67,27 @@ function RatingClass()
 		var reti = new Array();
 		
 		// если активный пользователь - пользователь, запустивший приложение,
-		if(ActiveUserObject.UserId == RatingTable[2].UserId)
+		if(ActiveUserObject.UserId == RatingTable[MainUserRatingPosition].UserId)
 		{
 			// если ответ правильный, то прибавляем к счету пользователя, запустившего приложение points очков
 			if(isRight)
 			{
-				RatingTable[2].UserScoreDiv.innerText = parseInt(RatingTable[2].UserScoreDiv.innerText) + points;
-				AnimateScore(RatingTable[2].UserAnimateDiv, '+' + points, '0000ff');
+				RatingTable[MainUserRatingPosition].UserScoreDiv.innerText = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) + points;
+				AnimateScore(RatingTable[MainUserRatingPosition].UserAnimateDiv, '+' + points, '0000ff');
 			}
 			// если ответ неправильный
 			else
 			{
 				// Если счет пользователя, запустившего приложение, больше 100 очков, то вычитаем 2 очка
-				if(parseInt(RatingTable[2].UserScoreDiv.innerText) > 100)
+				if(parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) > 100)
 				{
-					RatingTable[2].UserScoreDiv.innerText = parseInt(RatingTable[2].UserScoreDiv.innerText) - 2;
-					AnimateScore(RatingTable[2].UserAnimateDiv, '-2', 'ff0000');
+					RatingTable[MainUserRatingPosition].UserScoreDiv.innerText = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) - 2;
+					AnimateScore(RatingTable[MainUserRatingPosition].UserAnimateDiv, '-2', 'ff0000');
 				}
 			}
 			// в возвращаемый массив по индексу score кладем значение счета и id пользователя
-			reti['score'] = parseInt(RatingTable[2].UserScoreDiv.innerText);
-			reti['id'] = RatingTable[2].UserId;
+			reti['score'] = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText);
+			reti['id'] = RatingTable[MainUserRatingPosition].UserId;
 		}
 		// если активный пользователь - не пользователь, запустивший приложение
 		else
@@ -100,12 +105,12 @@ function RatingClass()
 			// если ответ неправильный, то вычитаем из счета пользователя, запустившего приложение 2 очка
 			else
 			{
-				RatingTable[2].UserScoreDiv.innerText = parseInt(RatingTable[2].UserScoreDiv.innerText) - 2;
-				AnimateScore(RatingTable[2].UserAnimateDiv, '-2', 'ff0000')
+				RatingTable[MainUserRatingPosition].UserScoreDiv.innerText = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) - 2;
+				AnimateScore(RatingTable[MainUserRatingPosition].UserAnimateDiv, '-2', 'ff0000')
 				
 				// в возвращаемый массив по индексу score кладем значение счета и id пользователя
-				reti['score'] = parseInt(RatingTable[2].UserScoreDiv.innerText);
-				reti['id'] = RatingTable[2].UserId;
+				reti['score'] = parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText);
+				reti['id'] = RatingTable[MainUserRatingPosition].UserId;
 			}
 		}
 		return reti;
@@ -116,6 +121,7 @@ function RatingClass()
  * Приватные методы
  */		
 	// функция обновления содержимого рейтинга
+	// TODO: покорявить php файлы
 	var UpdateRating = function()
 	{
 		// выполняем rating.php для обновления данных в $_SESSION
@@ -135,6 +141,8 @@ function RatingClass()
 				success	:	function(json)
 							{
 								var data = jQuery.parseJSON(json);
+								var CurrentActiveUserID = 0;
+								var CurrentMainPosition = MainUserRatingPosition;
 								for(var i = 0; i < 5; ++i)
 								{
 									RatingTable[i].UserId = data[i].id;
@@ -143,7 +151,27 @@ function RatingClass()
 									RatingTable[i].UserRankDiv.innerText = data[i].rank;
 									RatingTable[i].UserPicDiv.src = data[i].pic;
 									RatingTable[i].UserScoreDiv.innerText = data[i].score;
+									// проверяем нашу позицию в рейтинге
+									// она могла измениться(со 2й), например на 1ю. Надо бы обновить
+									if(MainUserID == data[i].id)
+										MainUserRatingPosition = i;
+									// да, мы могли играть против человека X и опустить его в задницу за рейтинг.
+									// так как продолжать его опускать уже негуманно, надо поставить счетчик на себя.
+									// если опустили еще не за границу - надо завершить начатое, ибо нехрен
+									if(ActiveUserObject.UserId == data[i].id)
+										CurrentActiveUserID = data[i].id;										
 								}
+								// если ID выбранного пользователя не изменилось, это значит только то,
+								// что мы его выкинули за границы рейтинга. Цель достигнута, ставим себя активным
+								if(CurrentActiveUserID == 0)
+									SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv)
+								else	
+									// иначе есть еще шанс, что мы опустили себя(или подняли)
+									// если наша позиция в таблице рейтинга сменилась, то надо-бы обновится
+									if(CurrentMainPosition != MainUserRatingPosition)
+									{
+										SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv);
+									}
 							}
 			});
 	}
@@ -232,10 +260,10 @@ function RatingClass()
 	{		
 		// если активный пользователь - не пользователь, запустивший приложение
 		// и количество очков пользователя, запустившего приложение < 100,
-		// то переключение в режим "игры против" невозможен
-		if(RatingTable[parseInt(obj.id)].UserId != RatingTable[2].UserId)
+		// то переключение в режим "игры против" невозможно
+		if(RatingTable[parseInt(obj.id)].UserId != RatingTable[MainUserRatingPosition].UserId)
 		{
-			if(parseInt(RatingTable[2].UserScoreDiv.innerText) < 100)
+			if(parseInt(RatingTable[MainUserRatingPosition].UserScoreDiv.innerText) < 100)
 				return;
 		}
 		
@@ -253,10 +281,6 @@ function RatingClass()
 		obj.children[1].style.background = 'B8B897';
 		
 		// TODO: Убрать эту часть за класс
-		$('#variant1').attr('value', 0);
-		$('#variant2').attr('value', 0);
-		$('#variant3').attr('value', 0);
-		$('#variant4').attr('value', 0);
 		getNewPicture();
 	}
 
@@ -298,6 +322,8 @@ function RatingClass()
  
 	// инициализируем сами div`ы
 	InitRating();
+	// задаем свой Id
+	MainUserID = UserId;
 	
 	// инициализация массива пользователей
 	for(var i = 0; i < 5; ++i)
@@ -335,12 +361,14 @@ function RatingClass()
 									RatingTable[i].UserRankDiv.innerText = data[i].rank;
 									RatingTable[i].UserPicDiv.src = data[i].pic;
 									RatingTable[i].UserScoreDiv.innerText = data[i].score;
+									if(MainUserID == data[i].id)
+										MainUserRatingPosition = i;
 								}
 							}
 			});
-			
+	
 	// задаем себя активным игроком
-	ActiveUserObject = RatingTable[2];
-	SetActiveUser(RatingTable[2].MainDiv);
+	ActiveUserObject = RatingTable[MainUserRatingPosition];
+	SetActiveUser(RatingTable[MainUserRatingPosition].MainDiv);
 	
 }	
